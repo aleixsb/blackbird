@@ -65,32 +65,15 @@ double getAvail(Parameters& params, std::string currency) {
 }
 
 std::string sendLongOrder(Parameters& params, std::string direction, double quantity, double price) {
-  if (direction.compare("buy") != 0 && direction.compare("sell") != 0) {
-    *params.logFile  << "<Kraken> Error: Neither \"buy\" nor \"sell\" selected" << std::endl;
-    return "0";
-  }
-  *params.logFile << "<Kraken> Trying to send a \"" << direction << "\" limit order: "
-                  << std::setprecision(6) << quantity << " @ $"
-                  << std::setprecision(2) << price << "...\n";
-  std::string pair = "XXBTZUSD";
-  std::string type = direction;
-  std::string ordertype = "limit";
-  std::string pricelimit = std::to_string(price);
-  std::string volume = std::to_string(quantity);
-  std::string options = "pair=" + pair + "&type=" + type + "&ordertype=" + ordertype + "&price=" + pricelimit + "&volume=" + volume;
-  unique_json root { authRequest(params, "/0/private/AddOrder", options) };
-  json_t *res = json_object_get(root.get(), "result");
-  if (json_is_object(res) == 0) {
-    *params.logFile << json_dumps(root.get(), 0) << std::endl;
-    exit(0);
-  }
-  std::string txid = json_string_value(json_array_get(json_object_get(res, "txid"), 0));
-  *params.logFile << "<Kraken> Done (transaction ID: " << txid << ")\n" << std::endl;
-  return txid;
+    return sendOrder(params, direction, quantity, price);
 }
 
 std::string sendShortOrder(Parameters& params, std::string direction, double quantity, double price) {
-  if (direction.compare("buy") != 0 && direction.compare("sell") != 0) {
+    return sendOrder(params, direction, quantity, price);
+}
+
+std::string sendOrder(Parameters& params, std::string direction, double quantity, double price){
+    if (direction.compare("buy") != 0 && direction.compare("sell") != 0) {
     *params.logFile  << "<Kraken> Error: Neither \"buy\" nor \"sell\" selected" << std::endl;
     return "0";
   }
